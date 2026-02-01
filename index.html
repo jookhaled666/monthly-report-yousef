@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bi-Weekly Report | Youssef Khaled</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Palette from "The Mayor" image - Dark Glass Theme */
+            --brand-primary: #e05d35;    /* Vibrant Burnt Orange */
+            --brand-secondary: #f0b48a;  /* Soft Peach/Apricot */
+            --brand-dark: #ffffff;       /* Headings White */
+            --brand-text: #e2e2e2;       /* Body Text Light Grey */
+            --brand-muted: #a3a3a3;      /* Muted Text */
+            
+            /* Backgrounds */
+            --bg-body: #050505;          /* Deep Black */
+            --bg-glass: rgba(20, 20, 20, 0.75); /* Darker, more solid glass */
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.03);
+            
+            /* Status Colors */
+            --status-success-bg: rgba(16, 185, 129, 0.15);
+            --status-success-text: #34d399;
+            --status-warning-bg: rgba(245, 158, 11, 0.15);
+            --status-warning-text: #fbbf24;
+            --status-info-bg: rgba(59, 130, 246, 0.15);
+            --status-info-text: #60a5fa;
+
+            /* Spacing & Layout */
+            --radius: 16px;
+            --backdrop: blur(20px);
+            --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body {
+            font-family: 'Inter', sans-serif; /* Default to English font */
+            background-color: var(--bg-body);
+            /* Refined Professional Dark Gradient */
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(224, 93, 53, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(240, 180, 138, 0.05) 0%, transparent 45%),
+                linear-gradient(180deg, #0a0a0a 0%, #111111 100%);
+            background-attachment: fixed;
+            color: var(--brand-text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Language Switching & Direction Logic */
+        html[lang="ar"] body { font-family: 'Cairo', sans-serif; }
+        
+        .lang-en { display: block; }
+        .lang-ar { display: none; }
+        
+        html[lang="ar"] .lang-en { display: none; }
+        html[lang="ar"] .lang-ar { display: block; }
+        html[lang="ar"] .inline-ar { display: inline; }
+
+        /* Toolbar */
+        .toolbar {
+            position: fixed;
+            top: 30px;
+            right: 30px; /* LTR Default */
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+        }
+        
+        /* Flip toolbar for RTL */
+        html[dir="rtl"] .toolbar { right: auto; left: 30px; }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--brand-dark);
+            backdrop-filter: blur(10px);
+            font-size: 0.85rem;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, var(--brand-primary), #b04523);
+            border: none;
+            box-shadow: 0 4px 15px rgba(224, 93, 53, 0.3);
+        }
+        
+        .btn.primary:hover {
+            box-shadow: 0 6px 20px rgba(224, 93, 53, 0.4);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 25px 80px 25px;
+        }
+
+        /* Glass Panel Standard */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: var(--backdrop);
+            -webkit-backdrop-filter: var(--backdrop);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-card);
+            border-radius: var(--radius);
+        }
+
+        /* Header */
+        .report-header {
+            padding: 40px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%; /* LTR Default */
+            background: var(--brand-primary);
+        }
+        
+        html[dir="rtl"] .report-header::before {
+            left: auto; right: 0;
+        }
+
+        .header-main h1 {
+            margin: 10px 0 15px 0;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--brand-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .badge {
+            background: rgba(224, 93, 53, 0.15);
+            color: var(--brand-primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(224, 93, 53, 0.3);
+        }
+
+        .meta-grid {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            color: var(--brand-muted);
+            font-size: 0.95rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .meta-item i { color: var(--brand-primary); }
+
+        .logo-box {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .logo-text {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            color: var(--brand-dark);
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+        
+        .logo-sub {
+            color: var(--brand-primary);
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        /* KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kpi-card:hover { border-color: rgba(224, 93, 53, 0.4); }
+
+        .kpi-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--brand-dark);
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+
+        .kpi-label {
+            color: var(--brand-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .kpi-icon-bg {
+            position: absolute;
+            right: 20px; top: 50%; /* LTR Default */
+            transform: translateY(-50%);
+            font-size: 3.5rem;
+            color: rgba(255,255,255,0.03);
+            pointer-events: none;
+        }
+        
+        html[dir="rtl"] .kpi-icon-bg { right: auto; left: 20px; }
+
+        /* Main Layout Grid */
+        .content-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .section-box {
+            padding: 30px;
+            height: 100%;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--brand-dark);
+        }
+        
+        .section-icon { color: var(--brand-primary); font-size: 1.1rem; }
+
+        /* Modern Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 20px; /* LTR Default */
+            border-left: 2px solid rgba(255,255,255,0.1); /* LTR Default */
+        }
+        
+        html[dir="rtl"] .timeline {
+            padding-left: 0; padding-right: 20px;
+            border-left: none; border-right: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 40px;
+        }
+        
+        .timeline-item:last-child { margin-bottom: 0; }
+
+        .timeline-marker {
+            position: absolute;
+            left: -26px; top: 0; /* LTR Default */
+            width: 14px; height: 14px;
+            background: var(--bg-body);
+            border: 2px solid var(--brand-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(224, 93, 53, 0.4);
+        }
+        
+        html[dir="rtl"] .timeline-marker {
+            left: auto; right: -26px;
+        }
+
+        .timeline-date {
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+            margin-bottom: 8px;
+            background: rgba(224, 93, 53, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .timeline-content h4 {
+            margin: 0 0 12px 0;
+            font-size: 1.1rem;
+            color: var(--brand-dark);
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .task-list li {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+        }
+        
+        .task-list li:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        .task-list strong { color: #fff; display: block; margin-bottom: 3px; }
+
+        /* Status Pills */
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .status-row:last-child { border-bottom: none; }
+
+        .status-info h5 { margin: 0 0 4px 0; color: var(--brand-dark); font-size: 0.95rem; }
+        .status-info span { font-size: 0.8rem; color: var(--brand-muted); }
+
+        .pill {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .pill.green { background: var(--status-success-bg); color: var(--status-success-text); border: 1px solid rgba(52, 211, 153, 0.2); }
+        .pill.amber { background: var(--status-warning-bg); color: var(--status-warning-text); border: 1px solid rgba(251, 191, 36, 0.2); }
+        .pill.blue { background: var(--status-info-bg); color: var(--status-info-text); border: 1px solid rgba(96, 165, 250, 0.2); }
+
+        /* Next Steps Highlight */
+        .next-steps-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.2));
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .toolbar { position: static; justify-content: flex-end; margin-bottom: 20px; width: 100%; padding: 0 25px; margin-top: 25px; }
+            .report-header { flex-direction: column; gap: 20px; text-align: center; }
+            .report-header::before { width: 100%; height: 4px; bottom: 0; top: auto; left: 0; }
+            .meta-grid { justify-content: center; flex-wrap: wrap; }
+            .kpi-grid, .content-layout { grid-template-columns: 1fr; }
+            .main-container { padding-top: 0; }
+        }
+
+        /* Print Styles */
+        @media print {
+            .toolbar { display: none; }
+            body { background: white !important; color: black !important; }
+            .glass-panel, .section-box, .kpi-card { 
+                background: white !important; 
+                color: black !important; 
+                box-shadow: none !important; 
+                border: 1px solid #ddd !important;
+                backdrop-filter: none !important;
+            }
+            .timeline-marker { background: white !important; border-color: black !important; }
+            .kpi-value, .header-main h1, .section-title { color: black !important; }
+            .pill { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; }
+            .kpi-icon-bg { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <button class="btn" onclick="toggleLanguage()">
+            <i class="fas fa-globe"></i>
+            <span class="lang-en">العربية</span>
+            <span class="lang-ar">English</span>
+        </button>
+        <button class="btn primary" onclick="window.print()">
+            <i class="fas fa-print"></i>
+            <span class="lang-en">Print Report</span>
+            <span class="lang-ar">طباعة التقرير</span>
+        </button>
+    </div>
+
+    <div class="main-container">
+        
+        <!-- Header Section -->
+        <header class="report-header glass-panel">
+            <div class="header-main">
+                <span class="badge">
+                    <span class="lang-en">Bi-Weekly Report</span>
+                    <span class="lang-ar">تقرير نصف شهري</span>
+                </span>
+                <h1>
+                    <span class="lang-en">Executive Progress & Achievements</span>
+                    <span class="lang-ar">تقرير الإنجازات والتقدم التنفيذي</span>
+                </h1>
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <i class="far fa-calendar-alt"></i>
+                        <span>Jan 14, 2026 - Jan 29, 2026</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Youssef Khaled</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-briefcase"></i>
+                        <span>SEO Specialist & Zoho Admin</span>
+                    </div>
+                </div>
+            </div>
+            <div class="logo-box">
+                <div class="logo-text">The Mayor</div>
+                <div class="logo-sub">AGENCY</div>
+            </div>
+        </header>
+
+        <!-- KPI Metrics -->
+        <div class="kpi-grid">
+            <div class="kpi-card glass-panel">
+                <i class="fas fa-check-circle kpi-icon-bg"></i>
+                <div class="kpi-value">29</div>
+                <div class="kpi-label">
+                    <span class="lang-en">Optimized Portfolio Pages</span>
+                    <span class="lang-ar">صفحة تم تحسينها (SEO)</span>
+                </div>
+            </div>
+            <div class="kpi-card glass-panel">
+                <i class="fas fa-envelope-open kpi-icon-bg"></i>
+                <div class="kpi-value">18</div>
+                <div class="kpi-label">
+                    <span class="lang-en">Corporate Emails Active</span>
+                    <span class="lang-ar">حساب بريد مؤسسي فعال</span>
+                </div>
+            </div>
+            <div class="kpi-card glass-panel">
+                <i class="fab fa-slack kpi-icon-bg"></i>
+                <div class="kpi-value">100%</div>
+                <div class="kpi-label">
+                    <span class="lang-en">Slack Infrastructure Ready</span>
+                    <span class="lang-ar">جاهزية بيئة عمل Slack</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="content-layout">
+            
+            <!-- Left Column: Operations & Timeline -->
+            <div class="section-box glass-panel">
+                <div class="section-header">
+                    <i class="fas fa-stream section-icon"></i>
+                    <h3 class="section-title">
+                        <span class="lang-en">Operational Timeline</span>
+                        <span class="lang-ar">سجل العمليات الزمني</span>
+                    </h3>
+                </div>
+                
+                <div class="timeline">
+                    <!-- Week 1 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <span class="timeline-date">
+                            <span class="lang-en">Phase 1: Jan 14 - Jan 20</span>
+                            <span class="lang-ar">المرحلة الأولى: 14 - 20 يناير</span>
+                        </span>
+                        <div class="timeline-content">
+                            <h4>
+                                <span class="lang-en">SEO Optimization & Frontend Dev</span>
+                                <span class="lang-ar">تحسين محركات البحث وتطوير الويب</span>
+                            </h4>
+                            <ul class="task-list">
+                                <li>
+                                    <span class="lang-en"><strong>Technical SEO Audit:</strong> Audited and optimized 29 portfolio pages including meta tags, header hierarchy (H1-H6), and alt text for organic growth.</span>
+                                    <span class="lang-ar"><strong>تدقيق SEO شامل:</strong> تحسين تقني لـ 29 صفحة تشمل Meta Tags، هيكلة العناوين، والنصوص البديلة للصور.</span>
+                                </li>
+                                <li>
+                                    <span class="lang-en"><strong>Masterclass Landing Page:</strong> Initiated HTML5/CSS3 responsive architecture for the new Masterclass campaign page.</span>
+                                    <span class="lang-ar"><strong>صفحة الماستر كلاس:</strong> البدء في تطوير الهيكل البرمجي (Frontend) لصفحة الهبوط الجديدة بشكل متجاوب.</span>
+                                </li>
+                                <li>
+                                    <span class="lang-en"><strong>Keyword Strategy:</strong> Developed high-intent keyword targeting strategy to maximize conversion rates.</span>
+                                    <span class="lang-ar"><strong>استراتيجية الكلمات المفتاحية:</strong> تطوير خطة استهداف للكلمات ذات معدل التحويل العالي.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Week 2 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <span class="timeline-date">
+                            <span class="lang-en">Phase 2: Jan 21 - Jan 29</span>
+                            <span class="lang-ar">المرحلة الثانية: 21 - 29 يناير</span>
+                        </span>
+                        <div class="timeline-content">
+                            <h4>
+                                <span class="lang-en">System Admin & Infrastructure</span>
+                                <span class="lang-ar">إدارة الأنظمة والبنية التحتية</span>
+                            </h4>
+                            <ul class="task-list">
+                                <li>
+                                    <span class="lang-en"><strong>Slack Workspace Deployment:</strong> Configured channels, permissions, and integrated Zoom/OneDrive for seamless collaboration.</span>
+                                    <span class="lang-ar"><strong>تجهيز بيئة Slack:</strong> إعداد القنوات والصلاحيات وربط تطبيقات Zoom و OneDrive للعمل الجماعي.</span>
+                                </li>
+                                <li>
+                                    <span class="lang-en"><strong>Email Migration (GoDaddy):</strong> Provisioned 18 accounts and initiated secure data migration protocol from legacy servers.</span>
+                                    <span class="lang-ar"><strong>ترحيل البريد الإلكتروني:</strong> إنشاء 18 حساب على GoDaddy والبدء في بروتوكول نقل البيانات الآمن.</span>
+                                </li>
+                                <li>
+                                    <span class="lang-en"><strong>Digital Identity:</strong> Deployed unified HTML email signatures company-wide for brand consistency.</span>
+                                    <span class="lang-ar"><strong>الهوية الرقمية:</strong> نشر توقيعات بريد إلكتروني موحدة لجميع الموظفين.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Stats & Plan -->
+            <div style="display: flex; flex-direction: column; gap: 30px;">
+                
+                <!-- Chart -->
+                <div class="section-box glass-panel" style="min-height: 300px;">
+                    <div class="section-header">
+                        <i class="fas fa-chart-pie section-icon"></i>
+                        <h3 class="section-title">
+                            <span class="lang-en">Effort Distribution</span>
+                            <span class="lang-ar">توزيع الجهد</span>
+                        </h3>
+                    </div>
+                    <div style="height: 200px; position: relative;">
+                        <canvas id="effortChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- System Health -->
+                <div class="section-box glass-panel">
+                    <div class="section-header">
+                        <i class="fas fa-heartbeat section-icon"></i>
+                        <h3 class="section-title">
+                            <span class="lang-en">System Health</span>
+                            <span class="lang-ar">حالة الأنظمة</span>
+                        </h3>
+                    </div>
+                    <div class="status-container">
+                        <div class="status-row">
+                            <div class="status-info">
+                                <h5>Slack Workspace</h5>
+                                <span class="lang-en">Collaboration Hub</span>
+                                <span class="lang-ar">مركز التواصل</span>
+                            </div>
+                            <span class="pill green">Active</span>
+                        </div>
+                        <div class="status-row">
+                            <div class="status-info">
+                                <h5>Data Migration</h5>
+                                <span class="lang-en">Email Transfer</span>
+                                <span class="lang-ar">نقل البيانات</span>
+                            </div>
+                            <span class="pill amber">Processing</span>
+                        </div>
+                        <div class="status-row">
+                            <div class="status-info">
+                                <h5>Masterclass Dev</h5>
+                                <span class="lang-en">Frontend</span>
+                                <span class="lang-ar">واجهة المستخدم</span>
+                            </div>
+                            <span class="pill blue">In Progress</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Steps -->
+                <div class="section-box glass-panel next-steps-card">
+                    <div class="section-header" style="border-bottom-color: rgba(255,255,255,0.15);">
+                        <i class="fas fa-forward section-icon" style="color: #fff;"></i>
+                        <h3 class="section-title" style="color: #fff;">
+                            <span class="lang-en">Next Steps</span>
+                            <span class="lang-ar">الخطوات القادمة</span>
+                        </h3>
+                    </div>
+                    <ul class="task-list">
+                        <li>
+                            <span class="lang-en"><strong>Launch:</strong> Final QA & Deploy Masterclass page.</span>
+                            <span class="lang-ar"><strong>الإطلاق:</strong> فحص الجودة وإطلاق صفحة الماستر كلاس.</span>
+                        </li>
+                        <li>
+                            <span class="lang-en"><strong>Completion:</strong> Verify 100% email data transfer.</span>
+                            <span class="lang-ar"><strong>الاكتمال:</strong> التأكد من نقل بيانات البريد بنسبة 100%.</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data for Chart
+        const labelsEn = ['System Admin', 'SEO', 'Web Dev'];
+        const labelsAr = ['إدارة الأنظمة', 'SEO', 'تطوير الويب'];
+        
+        // Initial setup
+        const ctx = document.getElementById('effortChart').getContext('2d');
+        Chart.defaults.font.family = "'Inter', 'Cairo', sans-serif";
+        Chart.defaults.color = '#a0a0a0';
+
+        let effortChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labelsEn, // Default English
+                datasets: [{
+                    data: [45, 30, 25],
+                    backgroundColor: ['#e05d35', '#f0b48a', '#525252'],
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 15,
+                            font: { size: 11 }
+                        }
+                    }
+                },
+                cutout: '75%',
+            }
+        });
+
+        // Toggle Language Function
+        function toggleLanguage() {
+            const html = document.documentElement;
+            const currentLang = html.getAttribute('lang');
+            
+            if (currentLang === 'en') {
+                // Switch to Arabic
+                html.setAttribute('lang', 'ar');
+                html.setAttribute('dir', 'rtl');
+                effortChart.data.labels = labelsAr;
+                effortChart.options.plugins.legend.position = 'left';
+            } else {
+                // Switch to English
+                html.setAttribute('lang', 'en');
+                html.setAttribute('dir', 'ltr');
+                effortChart.data.labels = labelsEn;
+                effortChart.options.plugins.legend.position = 'right';
+            }
+            effortChart.update();
+        }
+    </script>
+</body>
+</html>
